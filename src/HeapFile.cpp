@@ -21,7 +21,7 @@
 HeapFile::HeapFile(const char* fileName) :
 		file(fileName),
 		heap(file.Data<uint64_t>()) {
-	uint64_t size = file.size();
+	uint64_t size = file.Size();
 	if(size < 8) {
 		file.Resize(4096);
 		file.Data<uint64_t>()[0] = 0;

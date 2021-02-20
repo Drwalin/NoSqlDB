@@ -28,16 +28,41 @@ public:
 	~HeapFile();
 	
 	inline void Push(uint64_t value) {
-		if(file.Size() < 
-		
-		
+		if((file.Size()>>3) <= heap[0]+1) {
+			file.Reserve((heap[0]+512)<<3);
+		}
+		heap[0]++;
+		uint64_t i;
+		for(i=heap[0]; i>1; i>>=1) {
+			if(value >= heap[i>>1])
+				break;
+			heap[i] = heap[i>>1];
+		}
+		heap[i] = value;
 	}
 	
-	bool Pop(uint64_t& result);
-	
-	
-	
-	
+	inline bool Pop(uint64_t& result) {
+		if((file.Size()<<3) == 0 || heap[0] == 0)
+			return false;
+		result = heap[1];
+		uint64_t size = heap[0];
+		uint64_t last = heap[size];
+		heap[0]--;
+		uint64_t i, j;
+		for(i=1, j=2; j<=size; i=j, j<<=1) {
+			if(j < size) {
+				if(heap[j] > heap[j+1])
+					j=j+1;
+			}
+			if(last <= heap[j])
+				break;
+			heap[i] = heap[j];
+			
+		}
+		heap[i] = last;
+		return true;
+	}
+		
 private:
 	
 	uint64_t*& heap;
