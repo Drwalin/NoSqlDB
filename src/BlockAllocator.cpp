@@ -19,44 +19,36 @@
 #include "BlockAllocator.hpp"
 
 BlockAllocator::BlockAllocator(const char* memoryFile,
-			const char* bitmapFile) :
-		memory(this->memoryFile.Data()), bitmap(this->bitmapFile.Data<uint64_t>()){
+			const char* heapFile) :
+		memory(this->memoryFile.Data()) {
 	this->memoryFile.Open(memoryFile);
-	this->bitmapFile.Open(bitmapFile);
+	this->heap.Open(heapFile);
+	reservedBlocks = this->memoryFile.Size()>>blockOffsetBits;
 }
 
 BlockAllocator::~BlockAllocator() {
 	memoryFile.Close();
-	bitmapFile.Close();
-	memory = NULL;
+	heap.Close();
 }
 
 uint64_t BlockAllocator::AllocateBlock() {
-	uint64_t bitmapSize = bitmapFile.Size()>>3;
-	for(uint64_t i=0; i<bitmapSize; ++i) {
-		if(bitmap[i] != (uint64_t)(-1)) {
-			for(int j=0; j<64; ++j) {
-				if(bitmap[i]&(1<<j) == 0) {
-					bitmap[i] |= (1<<j);
-					return ((i<<6)+j) << blockOffsetBits;
-				}
-			}
-		}
-	}
-	bitmapFile.Reserve((bitmapSize<<3) + 64);
-	for(uint64_t i=bitmapSize; i<(bitmapFile.Size()>>3); ++i) {
-		bitmap[i] = 0;
-	}
-	bitmap[bitmapSize] = 1;
-	return bitmapSize<<(6+blockOffsetBits);
+	if(heap.Size() == 0)
+		Reserve(reservingBlocksAtOnce);
+	uint64_t ret=0;
+	heap.Pop(ret);
+	return ret<<blockOffsetBits;
 }
 
 void BlockAllocator::FreeBlock(uint64_t ptr) {
-	uint64_t blockId = ptr>>blockOffsetBits;
-	if(bitmapFile.Size() > blockId>>3) {
-		if(bitmap[blockId>>6] & (1<<(blockId&63))) {
-			bitmap[blockId>>6] ^= 1<<(blockId&63);
-		}
+	heap.Push(ptr>>blockOffsetBits);
+}
+
+void BlockAllocator::Reserve(uint64_t blocks) {
+	memoryFile.Reserve((reservedBlocks+blocks)<<blockOffsetBits);
+	uint64_t i=reservedBlocks;
+	reservedBlocks += blocks;
+	for(; i<reservedBlocks; ++i) {
+		heap.Push(i);
 	}
 }
 

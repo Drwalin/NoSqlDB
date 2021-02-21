@@ -24,19 +24,28 @@
 class HeapFile {
 public:
 	
+	const static uint64_t blockSize = 4096;
+	const static uint64_t blockSizeBits = 12;
+	
+	HeapFile();
 	HeapFile(const char* fileName);
 	~HeapFile();
 	
+	bool Open(const char* fileName);
+	void Close();
+	
 	inline void Push(uint64_t value) {
-		if((file.Size()>>3) <= heap[0]+1) {
-			file.Reserve((heap[0]+512)<<3);
-		}
 		heap[0]++;
-		uint64_t i;
-		for(i=heap[0]; i>1; i>>=1) {
-			if(value >= heap[i>>1])
+		if((file.Size()>>3) <= heap[0]) {
+			file.Reserve((((heap[0]>>blockSizeBits)+1)<<blockSizeBits)<<3);
+		}
+		uint64_t i, j, v;
+		for(i=heap[0], j=i>>1; i>1; i=j, j>>=1) {
+			v = heap[j];
+			if(value >= v) {
 				break;
-			heap[i] = heap[i>>1];
+			}
+			heap[i] = v;
 		}
 		heap[i] = value;
 	}
@@ -48,19 +57,24 @@ public:
 		uint64_t size = heap[0];
 		uint64_t last = heap[size];
 		heap[0]--;
-		uint64_t i, j;
+		uint64_t i, j, v;
 		for(i=1, j=2; j<=size; i=j, j<<=1) {
-			if(j < size) {
-				if(heap[j] > heap[j+1])
-					j=j+1;
+			v = heap[j];
+			if((j < size) && (v > heap[j+1])) {
+				++j;
+				v = heap[j];
 			}
-			if(last <= heap[j])
+			if(last <= v)
 				break;
-			heap[i] = heap[j];
+			heap[i] = v;
 			
 		}
 		heap[i] = last;
 		return true;
+	}
+	
+	inline uint64_t Size() const {
+		return heap[0];
 	}
 		
 private:

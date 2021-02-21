@@ -18,17 +18,34 @@
 
 #include "HeapFile.hpp"
 
-HeapFile::HeapFile(const char* fileName) :
-		file(fileName),
-		heap(file.Data<uint64_t>()) {
-	uint64_t size = file.Size();
-	if(size < 8) {
-		file.Resize(4096);
-		file.Data<uint64_t>()[0] = 0;
-	}
+#include <cstdio>
+#define DEBUG {fprintf(stderr, "\n %s:%i", __FILE__, __LINE__); fflush(stderr);}
+HeapFile::HeapFile() : heap(file.Data<uint64_t>()) {
+}
+
+HeapFile::HeapFile(const char* fileName) : heap(file.Data<uint64_t>()) {
+	Open(fileName);
 }
 
 HeapFile::~HeapFile() {
 	file.Close();
 }
+
+bool HeapFile::Open(const char* fileName) {
+	Close();
+	file.Open(fileName);
+	uint64_t size = file.Size();
+	if(heap == NULL)
+		return false;
+	if(size < 8) {
+		file.Resize(blockSize);
+		heap[0] = 0;
+	}
+	return true;
+}
+
+void HeapFile::Close() {
+	file.Close();
+}
+
 

@@ -20,14 +20,16 @@
 #define BLOCK_ALLOCATOR_HPP
 
 #include "CachedFile.hpp"
+#include "HeapFile.hpp"
 
 class BlockAllocator {
 public:
 	const static uint64_t blockSize = 4096;
 	const static uint64_t blockOffsetBits = 12;
+	const static uint64_t reservingBlocksAtOnce = 256;
 	
 	BlockAllocator(const char* memoryFile,
-			const char* bitmapFile);
+			const char* heapFile);
 	~BlockAllocator();
 	
 	uint64_t AllocateBlock();
@@ -35,11 +37,14 @@ public:
 	
 private:
 	
+	void Reserve(uint64_t blocks);
+	
+	uint64_t reservedBlocks;
+	
 	void*& memory;
 	CachedFile memoryFile;
 	
-	uint64_t*& bitmap;
-	CachedFile bitmapFile;
+	HeapFile heap;
 };
 
 #endif

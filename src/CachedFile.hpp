@@ -31,6 +31,9 @@ namespace boost {
 };
 #endif
 
+#include <cstdio>
+#define DEBUG {fprintf(stderr, "\n %s:%i", __FILE__, __LINE__); fflush(stderr);}
+
 // opening file for read and write even if it does not exists
 class CachedFile {
 public:

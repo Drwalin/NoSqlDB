@@ -22,7 +22,8 @@
 #include "CachedFile.hpp"
 
 #include <fstream>
-
+#include <cstdio>
+#define DEBUG {fprintf(stderr, "\n %s:%i", __FILE__, __LINE__); fflush(stderr);}
 bool CachedFile::Open(const char* fileName) {
 	Close();
 	{
