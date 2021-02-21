@@ -28,7 +28,7 @@ CachedFile file;
 uint64_t*& ptr = file.Data<uint64_t>();
 
 void Test(uint64_t elements, uint64_t expected) {
-	file.Open("file.db");
+	file.Open("testCachedFile.raw");
 	std::chrono::high_resolution_clock::time_point a =
 		std::chrono::high_resolution_clock::now();
 	file.Reserve(elements*8);
@@ -60,7 +60,7 @@ void Test(uint64_t elements, uint64_t expected) {
 			std::chrono::duration<double>(end1-beg).count(),
 			std::chrono::duration<double>(end2-end1).count());
 	
-	file.Open("file.db");
+	file.Open("testCachedFile.raw");
 	
 	beg = std::chrono::high_resolution_clock::now();
 	for(uint64_t i=0; i<elements; ++i) {
@@ -79,7 +79,7 @@ void Test(uint64_t elements, uint64_t expected) {
 
 int main() {
 	try {
-		{CachedFile d("file.db"); d.Resize(1); d.Data<char>()[0] = 'a';};
+		{CachedFile d("testCachedFile.raw"); d.Resize(1); d.Data<char>()[0] = 'a';};
 		uint64_t elements = 789931;
 		Test(elements, elements);
 		Test(elements, 0);

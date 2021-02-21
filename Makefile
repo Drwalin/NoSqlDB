@@ -4,13 +4,13 @@ INCLUDES = -IC:\Programs\mingw-w64\include -IC:\mingw-w64\include -Isrc
 LIBS = -LC:\Programs\mingw-w64\lib\boost\1_75 -LC:\mingw-w64\lib -lboost_iostreams
 CXXFLAGS = -m64 -std=c++17 -Ofast -s -static
 
-TestBlockAllocator: TestBlockAllocator.exe
+allocator: TestBlockAllocator.exe
 	TestBlockAllocator
 
-TestHeapFile: TestHeapFile.exe
+heap: TestHeapFile.exe
 	TestHeapFile
 
-TestCachedFile: TestCachedFile.exe
+cached: TestCachedFile.exe
 	TestCachedFile
 
 files_securere: $(OBJECT_FILES) bin\\TestCachedFile.o

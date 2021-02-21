@@ -24,8 +24,6 @@
 class HeapFile {
 public:
 	
-	friend class BlockAllocator;
-	
 	const static uint64_t blockSize = 4096;
 	const static uint64_t blockSizeBits = 12;
 	
@@ -42,8 +40,8 @@ public:
 	
 	inline uint64_t Size() const {return Origin()[0];}
 	
-	inline uint64_t* Origin() {return (uint64_t*)file.ptr;}
-	inline const uint64_t* Origin() const {return (uint64_t*)file.ptr;}
+	inline uint64_t* Origin() {return file.Origin<uint64_t>();}
+	inline const uint64_t* Origin() const {return file.Origin<uint64_t>();}
 	
 private:
 	

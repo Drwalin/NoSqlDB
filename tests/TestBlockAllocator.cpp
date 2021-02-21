@@ -28,14 +28,14 @@
 #include <set>
 #include <vector>
 
-BlockAllocator allocator;
-std::map<uint64_t, int64_t> allocated;
+std::map<uint64_t, int64_t> allocated, full;
 
-bool GetRandomAllocated(uint64_t& ptr) {
+template<typename T>
+bool GetRandomAllocated(T& allocator, uint64_t& ptr) {
 	if(allocated.size() == 0)
 		return false;
 	uint64_t min = allocated.begin()->first;
-	uint64_t max = allocated.rbegin()->first+4096;
+	uint64_t max = allocated.rbegin()->first+allocator.blockSize;
 	uint64_t bisect = RandMinMax(min, max);
 	auto it = allocated.lower_bound(bisect);
 	if(it == allocated.end()) {
@@ -47,10 +47,13 @@ bool GetRandomAllocated(uint64_t& ptr) {
 }
 
 void Test(uint64_t make, uint64_t remove) {
-	BlockAllocator allocator("memory.raw", "freeHeap.raw");
+	uint64_t max = 0;
+	BlockAllocator<1> allocator("memory.raw", "freeHeap.raw");
 	for(uint64_t i=0; i<make; ++i) {
 		uint64_t ptr = allocator.AllocateBlock();
+		max = std::max(max, ptr);
 		auto it = allocated.find(ptr);
+		full[ptr] = 1;
 		if(it == allocated.end()) {
 			allocated[ptr] = 1;
 		} else {
@@ -72,17 +75,18 @@ void Test(uint64_t make, uint64_t remove) {
 	
 	for(uint64_t i=0; i<remove; ++i) {
 		uint64_t ptr;
-		if(GetRandomAllocated(ptr)) {
+		if(GetRandomAllocated(allocator, ptr)) {
 			allocator.FreeBlock(ptr);
 			allocated[ptr]--;
 			if(allocated[ptr] == 0) {
 				allocated.erase(ptr);
 			}
-			
 		} else {
 			break;
 		}
 	}
+	
+	printf("\n allocated size = %llu", allocated.size());
 	
 	for(auto it : allocated) {
 		switch(it.second) {
@@ -95,7 +99,7 @@ void Test(uint64_t make, uint64_t remove) {
 		}
 	}
 	
-	printf("\n %llu, %llu", make, remove);
+	printf("\n make:%llu, remove:%llu, used:%llu", make, remove, full.size());
 	if(valid == false) {
 		printf(" ... FAULT \n");
 	} else {
@@ -105,7 +109,7 @@ void Test(uint64_t make, uint64_t remove) {
 
 int main() {
 	try {
-		Test(0, 54354234123434llu);
+		Test(0, 5435423llu*4123434llu);
 		Test(27331, 123);
 		Test(33423, 334);
 		Test(43424, 0);
@@ -118,6 +122,7 @@ int main() {
 		Test(0, 121);
 		Test(0, 121);
 		Test(0, 121);
+		Test(0, 5435423llu*4123434llu);
 	} catch(std::exception& e) {
 		printf("\n%s\n", e.what());
 	}

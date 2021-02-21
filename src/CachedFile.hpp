@@ -38,9 +38,6 @@ namespace boost {
 class CachedFile {
 public:
 	
-	friend class HeapFile;
-	friend class BlockAllocator;
-	
 	CachedFile() : ptr(NULL), file(NULL), size(0) {
 	}
 	CachedFile(const char* fileName) : ptr(NULL), file(NULL), size(0) {
@@ -65,6 +62,11 @@ public:
 	
 	uint64_t Resize(uint64_t newSize);
 	uint64_t Reserve(uint64_t minSize);
+	
+	template<typename T=void>
+	inline T* Origin() {return (T*)ptr;}
+	template<typename T=void>
+	inline const T* Origin() const {return (T*)ptr;}
 	
 private:
 	

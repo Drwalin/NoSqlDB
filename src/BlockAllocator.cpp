@@ -16,22 +16,25 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "BlockAllocator.hpp"
-
-BlockAllocator::BlockAllocator() {
-	reservedBlocks = 0;
+template<uint64_t a, uint64_t b>
+BlockAllocator<a, b>::BlockAllocator() {
+	preallocatedBlocks = 0;
 }
 
-BlockAllocator::BlockAllocator(const char* memoryFile, const char* heapFile) {
+template<uint64_t a, uint64_t b>
+BlockAllocator<a, b>::BlockAllocator(const char* memoryFile,
+		const char* heapFile) {
 	Open(memoryFile, heapFile);
 }
 
-BlockAllocator::~BlockAllocator() {
+template<uint64_t a, uint64_t b>
+BlockAllocator<a, b>::~BlockAllocator() {
 	memoryFile.Close();
 	heap.Close();
 }
 
-bool BlockAllocator::Open(const char* memoryFile, const char* heapFile) {
+template<uint64_t a, uint64_t b>
+bool BlockAllocator<a, b>::Open(const char* memoryFile, const char* heapFile) {
 	bool valid = this->memoryFile.Open(memoryFile);
 	valid &= this->heap.Open(heapFile);
 	if(!valid) {
@@ -39,11 +42,12 @@ bool BlockAllocator::Open(const char* memoryFile, const char* heapFile) {
 		this->heap.Close();
 		return valid;
 	}
-	reservedBlocks = this->memoryFile.Size()>>blockOffsetBits;
+	preallocatedBlocks = this->memoryFile.Size()>>blockOffsetBits;
 	return valid;
 }
 
-uint64_t BlockAllocator::AllocateBlock() {
+template<uint64_t a, uint64_t b>
+uint64_t BlockAllocator<a, b>::AllocateBlock() {
 	if(heap.Size() == 0)
 		Reserve(reservingBlocksAtOnce);
 	uint64_t ret=0;
@@ -51,18 +55,20 @@ uint64_t BlockAllocator::AllocateBlock() {
 	return ret<<blockOffsetBits;
 }
 
-void BlockAllocator::FreeBlock(uint64_t ptr) {
+template<uint64_t a, uint64_t b>
+void BlockAllocator<a, b>::FreeBlock(uint64_t ptr) {
 	heap.Push(ptr>>blockOffsetBits);
 }
 
-void BlockAllocator::Reserve(uint64_t blocks) {
-	memoryFile.Reserve((reservedBlocks+blocks)<<blockOffsetBits);
-	uint64_t i=reservedBlocks;
-	reservedBlocks += blocks;
+template<uint64_t a, uint64_t b>
+void BlockAllocator<a, b>::Reserve(uint64_t blocks) {
+	memoryFile.Reserve((preallocatedBlocks+blocks)<<blockOffsetBits);
+	uint64_t i=preallocatedBlocks;
+	preallocatedBlocks += blocks;
 	if(heap.Size() == 0) {
-		heap.BuildFromRange(i, reservedBlocks);
+		heap.BuildFromRange(i, preallocatedBlocks);
 	} else {
-		for(; i<reservedBlocks; ++i) {
+		for(; i<preallocatedBlocks; ++i) {
 			heap.Push(i);
 		}
 	}

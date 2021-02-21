@@ -28,15 +28,7 @@
 #include <cstdlib>
 #include <algorithm>
 
-#define DEBUG {fprintf(stderr, "\n %s:%i", __FILE__, __LINE__); fflush(stderr);}
-
-std::chrono::high_resolution_clock::time_point beg, end;
-#define Time() std::chrono::high_resolution_clock::now()
-#define DeltaTime() (std::chrono::duration<double>(end-beg).count())
-#define Start() (beg = Time())
-#define End() (end = Time())
-#define Rand16() ((uint64_t)rand())
-#define Rand64() Rand16() //((Rand16()<<48) | (Rand16()<<32) | (Rand16()>>16) | Rand16())
+#include "Debug.hpp"
 
 HeapFile heap;
 

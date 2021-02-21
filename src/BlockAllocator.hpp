@@ -24,19 +24,19 @@
 
 // TODO: Add BitmapFile class to store info about all allocated and free blocks
 
-uint64_t BitsForBlockSizeCorrect(uint64_t value) constexpr {
-	uint64_t i;
-	for(i=3; i<21 && value>(1<<i); ++i) {
+constexpr uint64_t BitsForBlockSizeCorrect(uint64_t value) {
+	uint64_t i=3;
+	for(; i<30 && value>(1<<i); ++i) {
 	}
 	return i;
 }
 
-template<uint64_t __blockSize = 4096>
+template<uint64_t __blockSize, uint64_t __reservingBlocksAtOnce = 512>
 class BlockAllocator {
 public:
-	const uint64_t blockOffsetBits = BitsForBlockSizeCorrect(__blockSize);
-	const uint64_t blockSize = 1<<blockOffsetBits;
-	const uint64_t reservingBlocksAtOnce = 256;
+	const static uint64_t blockOffsetBits = BitsForBlockSizeCorrect(__blockSize);
+	const static uint64_t blockSize = 1<<blockOffsetBits;
+	const static uint64_t reservingBlocksAtOnce = __reservingBlocksAtOnce;
 	
 	BlockAllocator();
 	BlockAllocator(const char* memoryFile, const char* heapFile);
@@ -49,16 +49,16 @@ public:
 	void FreeBlock(uint64_t ptr);
 	
 	template<typename T=void>
-	inline T* Origin() {return (T*)memoryFile.ptr;}
+	inline T* Origin() {return memoryFile.Origin<T>();}
 	template<typename T=void>
-	inline const T* Origin() const {return (T*)memoryFile.ptr;}
+	inline const T* Origin() const {return memoryFile.Origin<T>();}
 	
 private:
 	
 	void Reserve(uint64_t blocks);
 	
 	
-	uint64_t reservedBlocks;
+	uint64_t preallocatedBlocks;
 	
 	CachedFile memoryFile;
 	HeapFile heap;
