@@ -24,11 +24,19 @@
 
 // TODO: Add BitmapFile class to store info about all allocated and free blocks
 
+uint64_t BitsForBlockSizeCorrect(uint64_t value) constexpr {
+	uint64_t i;
+	for(i=3; i<21 && value>(1<<i); ++i) {
+	}
+	return i;
+}
+
+template<uint64_t __blockSize = 4096>
 class BlockAllocator {
 public:
-	const static uint64_t blockSize = 4096;
-	const static uint64_t blockOffsetBits = 12;
-	const static uint64_t reservingBlocksAtOnce = 256;
+	const uint64_t blockOffsetBits = BitsForBlockSizeCorrect(__blockSize);
+	const uint64_t blockSize = 1<<blockOffsetBits;
+	const uint64_t reservingBlocksAtOnce = 256;
 	
 	BlockAllocator();
 	BlockAllocator(const char* memoryFile, const char* heapFile);
@@ -55,6 +63,8 @@ private:
 	CachedFile memoryFile;
 	HeapFile heap;
 };
+
+#include "BlockAllocator.cpp"
 
 #endif
 

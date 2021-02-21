@@ -103,10 +103,9 @@ void Test(uint64_t make, uint64_t remove) {
 	}
 }
 
-
-
 int main() {
 	try {
+		Test(0, 54354234123434llu);
 		Test(27331, 123);
 		Test(33423, 334);
 		Test(43424, 0);
@@ -119,7 +118,6 @@ int main() {
 		Test(0, 121);
 		Test(0, 121);
 		Test(0, 121);
-		Test(0, 54354234123434llu);
 	} catch(std::exception& e) {
 		printf("\n%s\n", e.what());
 	}
