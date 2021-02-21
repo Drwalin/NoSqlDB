@@ -18,12 +18,10 @@
 
 #include "HeapFile.hpp"
 
-#include <cstdio>
-#define DEBUG {fprintf(stderr, "\n %s:%i", __FILE__, __LINE__); fflush(stderr);}
-HeapFile::HeapFile() : heap(file.Data<uint64_t>()) {
+HeapFile::HeapFile() {
 }
 
-HeapFile::HeapFile(const char* fileName) : heap(file.Data<uint64_t>()) {
+HeapFile::HeapFile(const char* fileName) {
 	Open(fileName);
 }
 
@@ -35,11 +33,11 @@ bool HeapFile::Open(const char* fileName) {
 	Close();
 	file.Open(fileName);
 	uint64_t size = file.Size();
-	if(heap == NULL)
+	if(Origin() == NULL)
 		return false;
 	if(size < 8) {
 		file.Resize(blockSize);
-		heap[0] = 0;
+		Origin()[0] = 0;
 	}
 	return true;
 }
@@ -48,4 +46,49 @@ void HeapFile::Close() {
 	file.Close();
 }
 
+void HeapFile::BuildFromRange(uint64_t min, uint64_t max) {
+	file.Reserve(((max-min)+1)<<3);
+	Origin()[0] = max-min;
+	for(uint64_t i=1; i<=Origin()[0]; ++i, ++min) {
+		Origin()[i] = min;
+	}
+}
 
+void HeapFile::Push(uint64_t value) {
+	Origin()[0]++;
+	if((file.Size()>>3) <= Origin()[0]) {
+		file.Reserve((((Origin()[0]>>blockSizeBits)+1)<<blockSizeBits)<<3);
+	}
+	uint64_t i, j, v;
+	for(i=Origin()[0], j=i>>1; i>1; i=j, j>>=1) {
+		v = Origin()[j];
+		if(value >= v) {
+			break;
+		}
+		Origin()[i] = v;
+	}
+	Origin()[i] = value;
+}
+
+bool HeapFile::Pop(uint64_t& result) {
+	if((file.Size()<<3) == 0 || Origin()[0] == 0)
+		return false;
+	result = Origin()[1];
+	uint64_t size = Origin()[0];
+	uint64_t last = Origin()[size];
+	Origin()[0]--;
+	uint64_t i, j, v;
+	for(i=1, j=2; j<=size; i=j, j<<=1) {
+		v = Origin()[j];
+		if((j < size) && (v > Origin()[j+1])) {
+			++j;
+			v = Origin()[j];
+		}
+		if(last <= v)
+			break;
+		Origin()[i] = v;
+		
+	}
+	Origin()[i] = last;
+	return true;
+}

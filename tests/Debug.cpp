@@ -16,39 +16,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef HEAP_FILE_HPP
-#define HEAP_FILE_HPP
+#include "Debug.hpp"
 
-#include "CachedFile.hpp"
-
-class HeapFile {
-public:
-	
-	friend class BlockAllocator;
-	
-	const static uint64_t blockSize = 4096;
-	const static uint64_t blockSizeBits = 12;
-	
-	HeapFile();
-	HeapFile(const char* fileName);
-	~HeapFile();
-	
-	bool Open(const char* fileName);
-	void Close();
-	
-	void Push(uint64_t value);
-	bool Pop(uint64_t& result);
-	void BuildFromRange(uint64_t min, uint64_t max); // excluding max
-	
-	inline uint64_t Size() const {return Origin()[0];}
-	
-	inline uint64_t* Origin() {return (uint64_t*)file.ptr;}
-	inline const uint64_t* Origin() const {return (uint64_t*)file.ptr;}
-	
-private:
-	
-	CachedFile file;
-};
-
-#endif
+std::chrono::high_resolution_clock::time_point beg, end;
 

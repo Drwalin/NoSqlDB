@@ -18,17 +18,29 @@
 
 #include "BlockAllocator.hpp"
 
-BlockAllocator::BlockAllocator(const char* memoryFile,
-			const char* heapFile) :
-		memory(this->memoryFile.Data()) {
-	this->memoryFile.Open(memoryFile);
-	this->heap.Open(heapFile);
-	reservedBlocks = this->memoryFile.Size()>>blockOffsetBits;
+BlockAllocator::BlockAllocator() {
+	reservedBlocks = 0;
+}
+
+BlockAllocator::BlockAllocator(const char* memoryFile, const char* heapFile) {
+	Open(memoryFile, heapFile);
 }
 
 BlockAllocator::~BlockAllocator() {
 	memoryFile.Close();
 	heap.Close();
+}
+
+bool BlockAllocator::Open(const char* memoryFile, const char* heapFile) {
+	bool valid = this->memoryFile.Open(memoryFile);
+	valid &= this->heap.Open(heapFile);
+	if(!valid) {
+		this->memoryFile.Close();
+		this->heap.Close();
+		return valid;
+	}
+	reservedBlocks = this->memoryFile.Size()>>blockOffsetBits;
+	return valid;
 }
 
 uint64_t BlockAllocator::AllocateBlock() {
@@ -47,8 +59,12 @@ void BlockAllocator::Reserve(uint64_t blocks) {
 	memoryFile.Reserve((reservedBlocks+blocks)<<blockOffsetBits);
 	uint64_t i=reservedBlocks;
 	reservedBlocks += blocks;
-	for(; i<reservedBlocks; ++i) {
-		heap.Push(i);
+	if(heap.Size() == 0) {
+		heap.BuildFromRange(i, reservedBlocks);
+	} else {
+		for(; i<reservedBlocks; ++i) {
+			heap.Push(i);
+		}
 	}
 }
 

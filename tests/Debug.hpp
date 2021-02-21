@@ -16,39 +16,27 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef HEAP_FILE_HPP
-#define HEAP_FILE_HPP
+#ifndef DEBUG_HPP
+#define DEBUG_HPP
 
-#include "CachedFile.hpp"
+#include <cstdio>
+#include <chrono>
+#include <ctime>
+#include <cmath>
+#include <cstdlib>
 
-class HeapFile {
-public:
-	
-	friend class BlockAllocator;
-	
-	const static uint64_t blockSize = 4096;
-	const static uint64_t blockSizeBits = 12;
-	
-	HeapFile();
-	HeapFile(const char* fileName);
-	~HeapFile();
-	
-	bool Open(const char* fileName);
-	void Close();
-	
-	void Push(uint64_t value);
-	bool Pop(uint64_t& result);
-	void BuildFromRange(uint64_t min, uint64_t max); // excluding max
-	
-	inline uint64_t Size() const {return Origin()[0];}
-	
-	inline uint64_t* Origin() {return (uint64_t*)file.ptr;}
-	inline const uint64_t* Origin() const {return (uint64_t*)file.ptr;}
-	
-private:
-	
-	CachedFile file;
-};
+#define DEBUG {fprintf(stderr, "\n %s:%i", __FILE__, __LINE__); fflush(stderr);}
+
+extern std::chrono::high_resolution_clock::time_point beg, end;
+
+#define Time() std::chrono::high_resolution_clock::now()
+#define DeltaTime() (std::chrono::duration<double>(end-beg).count())
+#define Start() (beg = Time())
+#define End() (end = Time())
+#define Rand16() ((uint64_t)rand())
+#define Rand32() ((Rand16()<<16) | Rand16())
+#define Rand64() ((Rand32()<<32) | Rand32())
+#define RandMinMax(MIN, MAX) ((Rand64()%(MAX-MIN+1))+MIN)
 
 #endif
 

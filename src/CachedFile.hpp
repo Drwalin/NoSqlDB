@@ -38,6 +38,9 @@ namespace boost {
 class CachedFile {
 public:
 	
+	friend class HeapFile;
+	friend class BlockAllocator;
+	
 	CachedFile() : ptr(NULL), file(NULL), size(0) {
 	}
 	CachedFile(const char* fileName) : ptr(NULL), file(NULL), size(0) {

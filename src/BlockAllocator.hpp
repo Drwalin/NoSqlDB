@@ -22,28 +22,37 @@
 #include "CachedFile.hpp"
 #include "HeapFile.hpp"
 
+// TODO: Add BitmapFile class to store info about all allocated and free blocks
+
 class BlockAllocator {
 public:
 	const static uint64_t blockSize = 4096;
 	const static uint64_t blockOffsetBits = 12;
 	const static uint64_t reservingBlocksAtOnce = 256;
 	
-	BlockAllocator(const char* memoryFile,
-			const char* heapFile);
+	BlockAllocator();
+	BlockAllocator(const char* memoryFile, const char* heapFile);
 	~BlockAllocator();
+	
+	bool Open(const char* memoryFile, const char* heapFile);
+	void Close();
 	
 	uint64_t AllocateBlock();
 	void FreeBlock(uint64_t ptr);
+	
+	template<typename T=void>
+	inline T* Origin() {return (T*)memoryFile.ptr;}
+	template<typename T=void>
+	inline const T* Origin() const {return (T*)memoryFile.ptr;}
 	
 private:
 	
 	void Reserve(uint64_t blocks);
 	
+	
 	uint64_t reservedBlocks;
 	
-	void*& memory;
 	CachedFile memoryFile;
-	
 	HeapFile heap;
 };
 
