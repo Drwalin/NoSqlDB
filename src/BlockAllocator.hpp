@@ -31,12 +31,11 @@ constexpr uint64_t BitsForBlockSizeCorrect(uint64_t value) {
 	return i;
 }
 
-template<uint64_t __blockSize, uint64_t __reservingBlocksAtOnce = 512>
+template<uint64_t __blockSize>
 class BlockAllocator {
 public:
 	const static uint64_t blockOffsetBits = BitsForBlockSizeCorrect(__blockSize);
 	const static uint64_t blockSize = 1<<blockOffsetBits;
-	const static uint64_t reservingBlocksAtOnce = __reservingBlocksAtOnce;
 	
 	BlockAllocator();
 	BlockAllocator(const char* memoryFile, const char* heapFile);
@@ -59,6 +58,7 @@ private:
 	
 	
 	uint64_t preallocatedBlocks;
+	uint64_t reservingBlocksAtOnce;
 	
 	CachedFile memoryFile;
 	HeapFile heap;

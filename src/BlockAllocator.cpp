@@ -16,25 +16,27 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-template<uint64_t a, uint64_t b>
-BlockAllocator<a, b>::BlockAllocator() {
+template<uint64_t a>
+BlockAllocator<a>::BlockAllocator() {
 	preallocatedBlocks = 0;
+	reservingBlocksAtOnce = 512;
 }
 
-template<uint64_t a, uint64_t b>
-BlockAllocator<a, b>::BlockAllocator(const char* memoryFile,
+template<uint64_t a>
+BlockAllocator<a>::BlockAllocator(const char* memoryFile,
 		const char* heapFile) {
+	reservingBlocksAtOnce = 512;
 	Open(memoryFile, heapFile);
 }
 
-template<uint64_t a, uint64_t b>
-BlockAllocator<a, b>::~BlockAllocator() {
+template<uint64_t a>
+BlockAllocator<a>::~BlockAllocator() {
 	memoryFile.Close();
 	heap.Close();
 }
 
-template<uint64_t a, uint64_t b>
-bool BlockAllocator<a, b>::Open(const char* memoryFile, const char* heapFile) {
+template<uint64_t a>
+bool BlockAllocator<a>::Open(const char* memoryFile, const char* heapFile) {
 	bool valid = this->memoryFile.Open(memoryFile);
 	valid &= this->heap.Open(heapFile);
 	if(!valid) {
@@ -46,8 +48,8 @@ bool BlockAllocator<a, b>::Open(const char* memoryFile, const char* heapFile) {
 	return valid;
 }
 
-template<uint64_t a, uint64_t b>
-uint64_t BlockAllocator<a, b>::AllocateBlock() {
+template<uint64_t a>
+uint64_t BlockAllocator<a>::AllocateBlock() {
 	if(heap.Size() == 0)
 		Reserve(reservingBlocksAtOnce);
 	uint64_t ret=0;
@@ -55,13 +57,13 @@ uint64_t BlockAllocator<a, b>::AllocateBlock() {
 	return ret<<blockOffsetBits;
 }
 
-template<uint64_t a, uint64_t b>
-void BlockAllocator<a, b>::FreeBlock(uint64_t ptr) {
+template<uint64_t a>
+void BlockAllocator<a>::FreeBlock(uint64_t ptr) {
 	heap.Push(ptr>>blockOffsetBits);
 }
 
-template<uint64_t a, uint64_t b>
-void BlockAllocator<a, b>::Reserve(uint64_t blocks) {
+template<uint64_t a>
+void BlockAllocator<a>::Reserve(uint64_t blocks) {
 	memoryFile.Reserve((preallocatedBlocks+blocks)<<blockOffsetBits);
 	uint64_t i=preallocatedBlocks;
 	preallocatedBlocks += blocks;
