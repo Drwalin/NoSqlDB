@@ -68,6 +68,11 @@ public:
 	template<typename T=void>
 	inline const T* Origin() const {return (T*)ptr;}
 	
+	template<typename T=void>
+	inline T* Origin(uint64_t offset) {return (T*)(ptr+offset);}
+	template<typename T=void>
+	inline const T* Origin(uint64_t offset) const {return (T*)(ptr+offset);}
+	
 private:
 	
 	uint64_t size;

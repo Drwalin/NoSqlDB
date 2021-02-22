@@ -31,10 +31,10 @@ constexpr uint64_t BitsForBlockSizeCorrect(uint64_t value) {
 	return i;
 }
 
-template<uint64_t __blockSize>
+template<uint64_t _blockSize>
 class BlockAllocator {
 public:
-	const static uint64_t blockOffsetBits = BitsForBlockSizeCorrect(__blockSize);
+	const static uint64_t blockOffsetBits = BitsForBlockSizeCorrect(_blockSize);
 	const static uint64_t blockSize = 1<<blockOffsetBits;
 	
 	BlockAllocator();
@@ -51,6 +51,11 @@ public:
 	inline T* Origin() {return memoryFile.Origin<T>();}
 	template<typename T=void>
 	inline const T* Origin() const {return memoryFile.Origin<T>();}
+	
+	template<typename T=void>
+	inline T* Origin(uint64_t offset) {return memoryFile.Origin<T>(offset);}
+	template<typename T=void>
+	inline const T* Origin(uint64_t offset) const {return memoryFile.Origin<T>(offset);}
 	
 private:
 	

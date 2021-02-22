@@ -108,6 +108,7 @@ void Test(uint64_t make, uint64_t remove) {
 }
 
 int main() {
+	printf("\n -1ll = %llX", -1ll);
 	try {
 		Test(0, 5435423llu*4123434llu);
 		Test(27331, 123);

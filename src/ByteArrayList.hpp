@@ -25,21 +25,21 @@
    linked block list structure:
    
    first block:
+    - 8B: pointer to next block	
     - 8B: size in bytes
 	- 8B: pointer to last block (optional: only if size>blockSize-16)
     - ..: data
-    - 8B: pointer to next block	
    
    other blocks:
-    - ..: data
 	- 8B: pointer to next block
+    - ..: data
    
    if pointer to next block = 0xFFF... then
       this is last block
    
 */
 
-template<uint64_t blockSize>
+template<typename T, uint64_t blockSize=64>
 class ByteBlockList {
 public:
 	
@@ -51,7 +51,7 @@ public:
 	   and with size of power of two and not grater that 8 bytes
 	   (only 1, 2, 4, 8 bytes)
 	*/
-	template<typename T>
+	template<typename TI=T>
 	class Iterator {
 	public:
 		
@@ -60,40 +60,37 @@ public:
 		Iterator(const Iterator& other);
 		Iterator(uint64_t block, uint64_t offset, ByteBlockList* list);
 		
-		inline T& operator*(int) {
-			return *(T*)(Origin()+block+offset);
-		}
+		inline TI& operator*(int) {return *Origin(block+offset);}
 		
-		inline bool operator==(const Iterator<T>& other) const {
+		inline bool operator==(const Iterator<TI>& other) const {
 			return block==other.block && offset==other.offset;
 		}
-		inline bool operator!=(const Iterator<T>& other) const {
+		inline bool operator!=(const Iterator<TI>& other) const {
 			return block!=other.block || offset!=other.offset;
 		}
 		
-		inline Iterator<T> next() const {
-			Iterator<T> ret = *this;
+		inline Iterator<TI> next() const {
+			Iterator<TI> ret = *this;
 			return ret++;
 		}
 		
-		inline Iterator<T>& operator++() {
-			offset += sizeof(T);
+		inline Iterator<TI>& operator++() {
+			offset += sizeof(TI);
 			if(offset >= AllocatorType::blockSize) {
-				block = Origin<uint64_t>()[
-						(AllocatorType::blockSize-1ll)>>3];
+				block = Origin<uint64_t>(AllocatorType::blockSize-8);
 				offset = 0;
 			}
 			return *this;
 		}
 		
-		inline Iterator<T> operator++(int) {
-			Iterator<T> ret = *this;
+		inline Iterator<TI> operator++(int) {
+			Iterator<TI> ret = *this;
 			this->operator++();
 			return ret;
 		}
 		
-		template<typename T2>
-		inline T2* Origin() {return list->Origin<T2>();}
+		inline TI* Origin() {return list->Origin<TI>();}
+		inline TI* Origin(uint64_t offset) {return list->Origin<TI>(offset);}
 		
 	private:
 		
@@ -112,42 +109,40 @@ public:
 	void Free(); // iterate over all blocks and free them
 	void InitEmpty() {
 		ptr = allocator->AllocateBlock();
-		uint64_t* p = Origin<uint64_t>()[ptr>>3];
+		uint64_t* p = Origin<uint64_t>(ptr);
 		p[0] = 0;
 		p[nextBlockOffset>>3] = -1ll;
 	}
 	void InitAtPosition(uint64_t ptr) {this->ptr = ptr;}
 	
-	template<typename T>
-	Iterator<T> begin() {
-		return Iterator<T>(ptr,
+	template<typename TI=T>
+	Iterator<TI> begin() {
+		return Iterator<TI>(ptr,
 				ptr ? ( size>(allocator->blockSize-16) ? 16 : 8 ) : 0,
 				this);
 	}
-	template<typename T>
-	inline Iterator<T> Begin() {return begin<T>():}
+	template<typename TI=T> inline Iterator<TI> Begin() {return begin<TI>():}
 	
-	template<typename T>
-	inline Iterator<T> end() {return Iterator<T>(-1ll, 0, this):}
-	template<typename T>
-	inline Iterator<T> End() {return end<T>():}
-	
-	
-	template<typename T>
-	T& at(uint64_t id);
-	template<typename T>
-	inline T& At(uint64_t id) {return at<T>();}
-	
+	template<typename TI=T>
+	inline Iterator<TI> end() {return Iterator<TI>(-1ll, 0, this):}
+	template<typename TI=T> inline Iterator<TI> End() {return end<TI>():}
 	
 	inline uint64_t size() const {
 		if(ptr == -1ll)
 			return 0;
-		return Origin<uint64_t>()[block>>3];
+		return Origin<uint64_t>(block);
 	}
 	inline uint64_t Size() const {return size():}
 	
 	template<typename T=void>
 	inline T* Origin() {return allocator->Origin<T>();}
+	template<typename T=void>
+	inline T* Origin() const {return allocator->Origin<T>();}
+	
+	template<typename T=void>
+	inline T* Origin(uint64_t offset) {return allocator->Origin<T>(offset);}
+	template<typename T=void>
+	inline const T* Origin(uint64_t offset) const {return allocator->Origin<T>(offset);}
 	
 private:
 	
