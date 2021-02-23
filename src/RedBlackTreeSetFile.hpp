@@ -100,15 +100,16 @@ public:
 	};
 	
 	
-	Iterator insert(Iterator it);		// return Iterator to new element
-	Iterator insert(uint64_t value);	// return Iterator to new element
+	Iterator insert(Iterator hint, uint64_t value);	// return Iterator to new element
+	Iterator insert(uint64_t value);				// return Iterator to new element
 	
 	Iterator erase(Iterator it);		// return Iterator to next element after removed
 	Iterator erase(uint64_t value);		// return Iterator to next element after removed
 	
+	Iterator find_closest(uint64_t value);
 	Iterator find(uint64_t value);
-	Iterator lower_bound(uint64_t value);
-	Iterator upper_bound(uint64_t value);
+	Iterator find_ge(uint64_t value);	// returns iterator to first element not lower than value
+	Iterator find_le(uint64_t value);	// returns iterator to first element not grater then value
 	
 	inline Iterator begin() {root().begin();}
 	inline Iterator rbegin() {root().rbegin();}

@@ -88,11 +88,76 @@ RedBlackTreeSetFile::Iterator RedBlackTreeSetFile::Iterator::rbegin() {
 
 
 
-RedBlackTreeSetFile::Iterator RedBlackTreeSetFile::Iterator::find(uint64_t value) {
+
+
+
+
+RedBlackTreeSetFile::Iterator RedBlackTreeSetFile::insert(Iterator hint, uint64_t value);
+RedBlackTreeSetFile::Iterator RedBlackTreeSetFile::insert(uint64_t value) {
+	return insert(find_close(value), value);
+}
+
+RedBlackTreeSetFile::Iterator RedBlackTreeSetFile::erase(Iterator it) {
+	if(!it)
+		return end();
+	Iterator next = it.next();
 	
+	...
+	
+	return next;
+}
+
+RedBlackTreeSetFile::Iterator RedBlackTreeSetFile::erase(uint64_t value) {
+	return erase(find(value));
 }
 
 
+
+RedBlackTreeSetFile::Iterator RedBlackTreeSetFile::find_closest(uint64_t value) {
+	Iterator it = root(), next;
+	while(true) {
+		uint64_t v = it.value();
+		if(value == v)
+			break;
+		else if(value < v)
+			next = it.left();
+		else
+			next = it.right();
+		if(next)
+			it = next;
+		else
+			break;
+	}
+	return it;
+}
+
+RedBlackTreeSetFile::Iterator RedBlackTreeSetFile::find(uint64_t value) {
+	Iterator it = root();
+	while(it) {
+		uint64_t v = it.value();
+		if(value == v)
+			break;
+		else if(value < v)
+			it = it.left();
+		else
+			it = it.right();
+	}
+	return it;
+}
+
+RedBlackTreeSetFile::Iterator RedBlackTreeSetFile::find_ge(uint64_t value) {
+	Iterator it = find_close(value);
+	if(it.value() < value)
+		return it.next();
+	return it;
+}
+
+RedBlackTreeSetFile::Iterator RedBlackTreeSetFile::find_le(uint64_t value) {
+	Iterator it = find_close(value);
+	if(it.value() > value)
+		return it.prev();
+	return it;
+}
 
 
 
