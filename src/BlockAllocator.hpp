@@ -24,6 +24,11 @@
 
 // TODO: Add BitmapFile class to store info about all allocated and free blocks
 
+/*
+   Instead of null pointer there are used -1 pointers.
+   When pointer has value -1 (0xFFFFFFFFFFFFFFFF) then this pointer is invalid.
+*/
+
 constexpr uint64_t BitsForBlockSizeCorrect(uint64_t value) {
 	uint64_t i=3;
 	for(; i<30 && value>(1<<i); ++i) {
