@@ -1,8 +1,11 @@
 
-OBJECT_FILES = bin\\CachedFile.o bin\\HeapFile.o bin\\DataBase.o
+OBJECT_FILES = bin\\CachedFile.o bin\\HeapFile.o bin\\TreeSetFile.o
 INCLUDES = -IC:\Programs\mingw-w64\include -IC:\mingw-w64\include -Isrc
 LIBS = -LC:\Programs\mingw-w64\lib\boost\1_75 -LC:\mingw-w64\lib -lboost_iostreams
 CXXFLAGS = -m64 -std=c++17 -Ofast -s -static
+
+tree: TestTreeSetFile.exe
+	TestTreeSetFile
 
 allocator: TestBlockAllocator.exe
 	TestBlockAllocator

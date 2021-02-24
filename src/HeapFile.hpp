@@ -24,8 +24,8 @@
 class HeapFile {
 public:
 	
-	const static uint64_t blockSize = 4096;
-	const static uint64_t blockSizeBits = 12;
+	const static uint64_t blockSize = 4096*1024;
+	const static uint64_t blockSizeBits = 22;
 	
 	HeapFile();
 	HeapFile(const char* fileName);

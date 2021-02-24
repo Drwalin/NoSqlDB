@@ -62,6 +62,13 @@ public:
 	template<typename T=void>
 	inline const T* Origin(uint64_t offset) const {return memoryFile.Origin<T>(offset);}
 	
+	inline void SetReservingBlocksCount(uint64_t blocks) {
+		if(blocks < 256)
+			reservingBlocksAtOnce = 256;
+		else
+			reservingBlocksAtOnce = blocks;
+	}
+	
 private:
 	
 	void Reserve(uint64_t blocks);
