@@ -24,12 +24,14 @@
 class HeapFile {
 public:
 	
-	const static uint64_t blockSize = 4096*1024;
-	const static uint64_t blockSizeBits = 22;
+	const static uint64_t blockSize = 4096;
+	const static uint64_t blockSizeBits = 12;
 	
 	HeapFile();
 	HeapFile(const char* fileName);
 	~HeapFile();
+	
+	inline operator bool() const {return (bool)file;}
 	
 	bool Open(const char* fileName);
 	void Close();

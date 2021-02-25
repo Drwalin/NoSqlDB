@@ -66,20 +66,22 @@ public:
 		
 		inline operator bool() const {return block!=-1;}
 		
-		inline Iterator next() const { Iterator ret = *this; return ret++;}
+		Iterator next() const;
 		Iterator& operator++();
 		Iterator operator++(int);
 		
-		inline Iterator prev() const { Iterator ret = *this; return ret--;}
+		inline Iterator prev() const;
 		Iterator& operator--();
 		Iterator operator--(int);
 		
 		inline Block& GetBlock() {return *allocator->Origin<Block>(block);}
+		inline const Block& GetBlock() const {return *allocator->Origin<Block>(block);}
 		
 		inline uint64_t& value() {return GetBlock().value;}
-		inline Iterator left() {return Iterator(GetBlock().left, allocator);}
-		inline Iterator right() {return Iterator(GetBlock().right, allocator);}
-		inline Iterator parent() {return Iterator(GetBlock().parent, allocator);}
+		inline uint64_t value() const {return GetBlock().value;}
+		inline Iterator left() const {return Iterator(GetBlock().left, allocator);}
+		inline Iterator right() const {return Iterator(GetBlock().right, allocator);}
+		inline Iterator parent() const {return Iterator(GetBlock().parent, allocator);}
 		
 		inline Iterator grandParent() {return parent().parent();}
 		Iterator sibling();
@@ -129,6 +131,8 @@ public:
 	
 	inline TreeSetFile& operator=(TreeSetFile&& other) {ptr=other.ptr; allocator=other.allocator; return*this;}
 	inline TreeSetFile& operator=(const TreeSetFile& other) {ptr=other.ptr; allocator=other.allocator; return*this;}
+	
+	inline operator bool() const {return ptr!=-1 && (bool)allocator && (bool)*allocator;}
 	
 	
 	Iterator insert(Iterator hint, uint64_t value);	// return Iterator to new element

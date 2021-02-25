@@ -58,6 +58,7 @@ public:
 	inline T*& Data() {return *(T**)&ptr;}
 	void Close();
 	
+	inline operator bool() const {return file!=NULL;}
 	inline bool IsOpen() const {return file!=NULL;}
 	
 	uint64_t Resize(uint64_t newSize);
@@ -69,9 +70,9 @@ public:
 	inline const T* Origin() const {return (T*)ptr;}
 	
 	template<typename T=void>
-	inline T* Origin(uint64_t offset) {return (T*)(ptr+offset);}
+	inline T* Origin(uint64_t offset) {return (T*)((uint8_t*)ptr+offset);}
 	template<typename T=void>
-	inline const T* Origin(uint64_t offset) const {return (T*)(ptr+offset);}
+	inline const T* Origin(uint64_t offset) const {return (T*)((uint8_t*)ptr+offset);}
 	
 private:
 	

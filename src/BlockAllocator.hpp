@@ -46,6 +46,8 @@ public:
 	BlockAllocator(const char* memoryFile, const char* heapFile);
 	~BlockAllocator();
 	
+	inline operator bool() const {return (bool)memoryFile && (bool)heap;}
+	
 	bool Open(const char* memoryFile, const char* heapFile);
 	void Close();
 	

@@ -18,12 +18,7 @@
 
 #include "TreeSetFile.hpp"
 
-TreeSetFile::Iterator& TreeSetFile::Iterator::operator++() {
-	(*this) = (*this)++;
-	return *this;
-}
-
-TreeSetFile::Iterator TreeSetFile::Iterator::operator++(int) {
+TreeSetFile::Iterator TreeSetFile::Iterator::next() const {
 	if(!*this)
 		return *this;
 	Iterator r = right();
@@ -43,13 +38,40 @@ TreeSetFile::Iterator TreeSetFile::Iterator::operator++(int) {
 	return p.right().begin();
 }
 
-TreeSetFile::Iterator& TreeSetFile::Iterator::operator--() {
-	(*this) = (*this)--;
+TreeSetFile::Iterator& TreeSetFile::Iterator::operator++() {
+	(*this) = next();
 	return *this;
 }
 
-TreeSetFile::Iterator TreeSetFile::Iterator::operator--(int) {
-	printf("\n TreeSetFile::Iterator TreeSetFile::Iterator::operator--(int) is not done!");
+TreeSetFile::Iterator TreeSetFile::Iterator::operator++(int) {
+	Iterator ret = *this;
+	(*this) = next();
+	return ret;
+}
+
+
+TreeSetFile::Iterator TreeSetFile::Iterator::prev() const {
+	if(!*this)
+		return *this;
+	Iterator r = left();
+	if(r)
+		return r.rbegin();
+	Iterator c = *this;
+	Iterator p = parent();
+	while(p) {
+		Iterator l = p.right();
+		if(l==c)
+			return p;
+		c = p;
+		p = c.parent();
+	}
+	if(!p)
+		return p;
+	return p.left().end();
+	
+	
+	
+	printf("\n TreeSetFile::Iterator TreeSetFile::Iterator::prev(int) const is not done!");
 	if(!*this)
 		return *this;
 	Iterator l = left();
@@ -58,6 +80,18 @@ TreeSetFile::Iterator TreeSetFile::Iterator::operator--(int) {
 	else
 		return l;
 }
+
+TreeSetFile::Iterator& TreeSetFile::Iterator::operator--() {
+	(*this) = prev();
+	return *this;
+}
+
+TreeSetFile::Iterator TreeSetFile::Iterator::operator--(int) {
+	Iterator ret = *this;
+	(*this) = prev();
+	return ret;
+}
+
 
 TreeSetFile::Iterator TreeSetFile::Iterator::sibling() {
 	Iterator parent = this->parent();
