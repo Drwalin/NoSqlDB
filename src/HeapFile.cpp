@@ -54,6 +54,14 @@ void HeapFile::BuildFromRange(uint64_t min, uint64_t max) {
 	}
 }
 
+void HeapFile::BuildFromRange(uint64_t min, uint64_t elements, uint64_t step) {
+	file.Reserve(((elements)+1)<<3);
+	Origin()[0] = elements;
+	for(uint64_t i=1; i<=elements; ++i, min+=step) {
+		Origin()[i] = min;
+	}
+}
+
 void HeapFile::Push(uint64_t value) {
 	Origin()[0]++;
 	if((file.Size()>>3) <= Origin()[0]) {

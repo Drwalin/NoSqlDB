@@ -39,6 +39,7 @@ public:
 	void Push(uint64_t value);
 	bool Pop(uint64_t& result);
 	void BuildFromRange(uint64_t min, uint64_t max); // excluding max
+	void BuildFromRange(uint64_t min, uint64_t elements, uint64_t step);
 	
 	inline uint64_t Size() const {return Origin()[0];}
 	
