@@ -19,6 +19,9 @@
 #ifndef RED_BLACK_TREE_SET_FILE_HPP
 #define RED_BLACK_TREE_SET_FILE_HPP
 
+#include <cinttypes>
+#include <cstdlib>
+
 class RedBlackTreeSetFile {
 public:
 	

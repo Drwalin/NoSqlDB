@@ -51,14 +51,14 @@ void Test(uint64_t elements, bool reopenclose=false) {
 		stlHeap.push(e);
 	}
 	End();
-	printf("\n stl pushing %llu took %.3f s -> %.2f M/s", elements, DeltaTime(), elements*0.000001/DeltaTime());
+	printf("\n stl pushing %lu took %.3f s -> %.2f M/s", elements, DeltaTime(), elements*0.000001/DeltaTime());
 	
 	Start();
 	for(uint64_t& e : inserts) {
 		heap.Push(e);
 	}
 	End();
-	printf("\n my  pushing %llu took %.3f s -> %.2f M/s", elements, DeltaTime(), elements*0.000001/DeltaTime());
+	printf("\n my  pushing %lu took %.3f s -> %.2f M/s", elements, DeltaTime(), elements*0.000001/DeltaTime());
 	
 	
 	if(reopenclose) {
@@ -78,7 +78,7 @@ void Test(uint64_t elements, bool reopenclose=false) {
 		stlHeap.pop();
 	}
 	End();
-	printf("\n stl poping  %llu took %.3f s -> %.2f M/s", pops.size(), DeltaTime(), pops.size()*0.000001/DeltaTime());
+	printf("\n stl poping  %lu took %.3f s -> %.2f M/s", pops.size(), DeltaTime(), pops.size()*0.000001/DeltaTime());
 	
 	pops.resize(heap.Size());
 	Start();
@@ -89,7 +89,7 @@ void Test(uint64_t elements, bool reopenclose=false) {
 		}
 	}
 	End();
-	printf("\n my  poping  %llu took %.3f s -> %.2f M/s", pops.size(), DeltaTime(), pops.size()*0.000001/DeltaTime());
+	printf("\n my  poping  %lu took %.3f s -> %.2f M/s", pops.size(), DeltaTime(), pops.size()*0.000001/DeltaTime());
 	
 	if(reopenclose) {
 		Start();
@@ -102,14 +102,14 @@ void Test(uint64_t elements, bool reopenclose=false) {
 	if(inserts != pops) {
 		printf(" ... FAULT!   (Look for details in 'TestHeapFile.log'");
 		FILE* out = fopen("TestHeapFile.log", "w+");
-		fprintf(out, "\n\n\n\n New fault test desciption (%llu elements):", elements);
+		fprintf(out, "\n\n\n\n New fault test desciption (%lu elements):", elements);
 		for(uint64_t i=0; i<inserts.size() || i<pops.size(); ++i) {
-			fprintf(out, "\n %llu : (", i);
+			fprintf(out, "\n %lu : (", i);
 			if(i<inserts.size())
-				fprintf(out, "%.5llu", inserts[i]);
+				fprintf(out, "%.5lu", inserts[i]);
 			fprintf(out, ", ");
 			if(i<pops.size())
-				fprintf(out, "%.5llu", pops[i]);
+				fprintf(out, "%.5lu", pops[i]);
 			fprintf(out, ")");
 		}
 		fclose(out);

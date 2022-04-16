@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <RedBlackTreeSetFile.hpp>
+
 RedBlackTreeSetFile::Iterator& RedBlackTreeSetFile::Iterator::operator++() {
 	(*this) = this->operator++(int);
 	return *this;

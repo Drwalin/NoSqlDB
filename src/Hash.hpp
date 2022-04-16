@@ -24,6 +24,8 @@
 #ifndef HASH_HPP
 #define HASH_HPP
 
+#include <cinttypes>
+
 namespace hash {
 	
 	const static uint32_t FNV_32_PRIME= (2<<24) + (2<<8) + 0x93;
@@ -33,7 +35,7 @@ namespace hash {
 	const static uint64_t FNV_64_OFFSET_BASIS = 14695981039346656037llu;
 	
 	inline void FNV1a64(uint64_t& hval, uint64_t data) {
-		hval ^= value;
+		hval ^= data;
 #if defined(NO_FNV_GCC_OPTIMIZATION)
 		hval *= FNV_64_PRIME;
 #else
@@ -63,9 +65,9 @@ namespace hash {
 		uint64_t rest = len-end;
 		if(rest) {
 			uint64_t v=0;
-			char* ptr = (char*)&val;
+			char* ptr = (char*)&v;
 			for(uint64_t i=0; i<rest; ++i) {
-				val[i] = str[end+i];
+				ptr[i] = str[end+i];
 			}
 			FNV1a64(hval, v);
 		}

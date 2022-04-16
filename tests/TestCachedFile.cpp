@@ -24,6 +24,8 @@
 
 #define DEBUG {fprintf(stderr, "\n %s:%i", __FILE__, __LINE__); fflush(stderr);}
 
+static inline const char* globalFileName = "testCachedFile.raw";
+
 CachedFile file;
 uint64_t*& ptr = file.Data<uint64_t>();
 
@@ -54,7 +56,7 @@ void Test(uint64_t elements, uint64_t expected) {
 	std::chrono::high_resolution_clock::time_point end2 =
 		std::chrono::high_resolution_clock::now();
 	
-	printf("\n not valid found: %llu/%llu   ... %s", foundNotEqual, expected,
+	printf("\n not valid found: %lu/%lu   ... %s", foundNotEqual, expected,
 			foundNotEqual!=expected?"FAULT":"OK");
 	printf("\n reading: %f + %f s",
 			std::chrono::duration<double>(end1-beg).count(),
@@ -75,11 +77,43 @@ void Test(uint64_t elements, uint64_t expected) {
 			std::chrono::duration<double>(end2-end1).count());
 }
 
+void TestReopen() {
+	const size_t elements = 1024*1024;
+	{
+		CachedFile file(globalFileName);
+		file.Resize(elements*sizeof(int));
+		int* ptr = file.Origin<int>();
+		for(int i=0; i<elements; ++i)
+			ptr[i] = i;
+	}
+	size_t invalid = 0;
+	for(int i=0; i<3; ++i) {
+		CachedFile file(globalFileName);
+		int* ptr = file.Origin<int>();
+		size_t size = file.Size();
+		if(size != elements*sizeof(int))
+			++invalid;
+		for(int i=0; i<size/sizeof(int); ++i)
+			if(ptr[i] != i)
+				++invalid;
+	}
+	printf(" Saved file reopen persistent data ... ");
+	if(invalid > 0) {
+		printf(" FAILED\n\n");
+	} else {
+		printf(" OK\n\n");
+	}
+}
 
 
 int main() {
 	try {
-		{CachedFile d("testCachedFile.raw"); d.Resize(1); d.Data<char>()[0] = 'a';};
+		TestReopen();
+		{
+			CachedFile d(globalFileName);
+			d.Resize(1);
+			d.Data<char>()[0] = 'a';
+		}
 		uint64_t elements = 789931;
 		Test(elements, elements);
 		Test(elements, 0);
@@ -89,6 +123,7 @@ int main() {
 	} catch(std::exception& e) {
 		printf("\n%s\n", e.what());
 	}
+	printf("\n\n");
 	return 0;
 }
 

@@ -94,8 +94,8 @@ void Test(TreeSetFile& fileSet, uint64_t make, uint64_t remove) {
 	End();
 	printf("\n fileSet %.0f push/s", make/DeltaTime());
 	
-	printf("\n %llu + %llu -> %llu (%.1f%% override)", size, make, stdSet.size(), 100.0*(double)(make-(stdSet.size()-size))/(double)(make));
-	printf("\n size: %llu\n height: %llu (optimal: %.0f)", fileSet.size(), fileSet.root().Height(), log2(fileSet.size())*2.0);
+	printf("\n %lu + %lu -> %lu (%.1f%% override)", size, make, stdSet.size(), 100.0*(double)(make-(stdSet.size()-size))/(double)(make));
+	printf("\n size: %lu\n height: %lu (optimal: %.0f)", fileSet.size(), fileSet.root().Height(), log2(fileSet.size())*2.0);
 	
 	Cmp(fileSet);
 	/*
@@ -105,7 +105,7 @@ void Test(TreeSetFile& fileSet, uint64_t make, uint64_t remove) {
 	
 	printf("\n Linear:");
 	for(auto it = fileSet.begin(); it!=fileSet.end(); ++it) {
-		printf("\n    %llu", *it);
+		printf("\n    %lu", *it);
 	}
 	printf("\n\n");
 	*/
@@ -124,8 +124,8 @@ void Test(TreeSetFile& fileSet, uint64_t make, uint64_t remove) {
 	End();
 	printf("\n fileSet %.0f pop/s", remove/DeltaTime());
 	
-	printf("\n %llu - %llu -> %llu (%.1f%% miss)", size, remove, stdSet.size(), 100.0*(double)(size-stdSet.size())/(double)(remove));
-	printf("\n size: %llu\n height: %llu (optimal: %.0f)", fileSet.size(), fileSet.root().Height(), log2(fileSet.size())*2.0);
+	printf("\n %lu - %lu -> %lu (%.1f%% miss)", size, remove, stdSet.size(), 100.0*(double)(size-stdSet.size())/(double)(remove));
+	printf("\n size: %lu\n height: %lu (optimal: %.0f)", fileSet.size(), fileSet.root().Height(), log2(fileSet.size())*2.0);
 	
 	Cmp(fileSet);
 }

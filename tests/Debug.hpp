@@ -25,7 +25,15 @@
 #include <cmath>
 #include <cstdlib>
 
-#define DEBUG {fprintf(stderr, "\n %s:%i", __FILE__, __LINE__); fflush(stderr);}
+constexpr bool enableDebug =
+#ifdef RELEASE_BUILD
+	false;
+#else
+	true;
+#endif
+
+
+#define DEBUG {if constexpr(enableDebug){fprintf(stderr, "\n %s:%i", __FILE__, __LINE__); fflush(stderr);}}
 
 extern std::chrono::high_resolution_clock::time_point beg, end;
 

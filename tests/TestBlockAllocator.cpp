@@ -68,7 +68,7 @@ void Test(uint64_t make, uint64_t remove) {
 			break;
 		default:
 			valid = false;
-			printf("\n invalid allocation amount for object: %llu : %lld",
+			printf("\n invalid allocation amount for object: %lu : %ld",
 					it.first, it.second);
 		}
 	}
@@ -86,7 +86,7 @@ void Test(uint64_t make, uint64_t remove) {
 		}
 	}
 	
-	printf("\n allocated size = %llu", allocated.size());
+	printf("\n allocated size = %lu", allocated.size());
 	
 	for(auto it : allocated) {
 		switch(it.second) {
@@ -94,12 +94,12 @@ void Test(uint64_t make, uint64_t remove) {
 			break;
 		default:
 			valid = false;
-			printf("\n invalid allocation amount for object: %llu : %lld",
+			printf("\n invalid allocation amount for object: %lu : %ld",
 					it.first, it.second);
 		}
 	}
 	
-	printf("\n make:%llu, remove:%llu, used:%llu", make, remove, full.size());
+	printf("\n make:%lu, remove:%lu, used:%lu", make, remove, full.size());
 	if(valid == false) {
 		printf(" ... FAULT \n");
 	} else {

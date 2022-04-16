@@ -88,19 +88,19 @@ void RemoveRandom() {
 
 
 void Test(uint64_t make, uint64_t minSize, uint64_t sizeVariance, uint64_t remove) {
-	DEBUG;
+// 	DEBUG;
 	for(uint64_t i=0; i<make; ++i)
 		AllocateNew((Rand64()%sizeVariance)+minSize);
 	
-	DEBUG;
+// 	DEBUG;
 	uint64_t used = allocator.used();
 	uint64_t reserved = allocator.reserved();
-	printf("\n used %llu / %llu (%.2f%%)", used, reserved, 100.0*used/(double)reserved);
-	DEBUG;
+	printf(" used %lu / %lu (%.2f%%) \n", used, reserved, 100.0*used/(double)reserved);
+// 	DEBUG;
 	
 	for(uint64_t i=0; i<remove; ++i)
 		RemoveRandom();
-	DEBUG;
+// 	DEBUG;
 	
 	
 	uint64_t notEqual = 0;
@@ -112,13 +112,13 @@ void Test(uint64_t make, uint64_t minSize, uint64_t sizeVariance, uint64_t remov
 	*/
 	used = allocator.used();
 	reserved = allocator.reserved();
-	printf("\n used %llu / %llu (%.2f%%)", used, reserved, 100.0*used/(double)reserved);
-	DEBUG;
+	printf(" used %lu / %lu (%.2f%%) \n", used, reserved, 100.0*used/(double)reserved);
+// 	DEBUG;
 	
 	if(notEqual == 0) {
-		printf("\n ... OK\n\n");
+		printf(" ... OK\n\n");
 	} else {
-		printf("\n not equal values: %llu ... FAULT\n\n", notEqual);
+		printf(" not equal values: %lu ... FAULT\n\n", notEqual);
 	}
 }
 
